@@ -15,9 +15,17 @@ class Network:
 		else:
 			self.nodes = nodes 
 
+	"""
+	COMPLETE - NEEDS FURTHER DRAFTING TO IMPROVE READABILITY
+	"""
 	def get_mean_degree(self):
-			print("")
-		#Your code  for task 3 goes here
+		print("")
+		list_of_lengths = []
+		for examplenode in self.nodes:
+				print(examplenode.connections)
+				print(str(len(examplenode.connections))+"\n")
+				list_of_lengths.append(len(examplenode.connections))
+		return mean(list_of_lengths)
 
 	def get_mean_clustering(self):
 			print("")
