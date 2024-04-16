@@ -73,12 +73,12 @@ class Network:
 			ax.add_patch(circle)
 
 			for neighbour_index in range(i+1, num_nodes):
-				if node.connections[neighbour_index]:
+				if neighbour_index in self.connections:
 					neighbour_angle = neighbour_index * 2 * np.pi / num_nodes
 					neighbour_x = network_radius * np.cos(neighbour_angle)
 					neighbour_y = network_radius * np.sin(neighbour_angle)
-
 					ax.plot((node_x, neighbour_x), (node_y, neighbour_y), color='black')
+		plt.show()
 
 def test_networks():
 
