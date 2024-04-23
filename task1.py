@@ -7,6 +7,15 @@ import matplotlib.cm as cm
 #READ: Currently this only contains the code for task 1, please copy paste the code from the other tasks over to complete them. 
 
 def random_pop(row, col, agree_prob):
+    '''
+    This function creates a random array of a population using an agree probability.
+    Inputs: 
+        row (int)
+        col (int)
+        agree_prob(float)
+    Returns: 
+        grid(numpy array)
+    '''
     gridTemp = np.random.rand(col, row)
     grid = []
     for row in gridTemp:
@@ -17,7 +26,7 @@ def random_pop(row, col, agree_prob):
             else:
                 embedGrid.append(1)
         grid.append(embedGrid)
-    return grid
+    return np.array(grid)
 
 def flip(int):
       if int == 1:
@@ -59,17 +68,20 @@ def ising_step(population, external=0.0, tolerance=0.0):
             external (float) - optional - the magnitude of any external "pull" on opinion
     '''
     
-    for row in range(0, len(population)):
-        for col in range(0, len(population[row])):
-            agreement = calculate_agreement(population, row, col, external=0.0)
-            if agreement < 0:
+    n_rows, n_cols = population.shape
+    row = np.random.randint(0, n_rows)
+    col  = np.random.randint(0, n_cols)
+    agreement = calculate_agreement(population, row, col, external=0.0)
+
+    if agreement < 0:
+        population[row, col] *= -1
+    else:
+        if tolerance > 0:
+            prob = np.e**(-agreement/tolerance)
+            event = np.random.rand()
+            if prob > event:
                 population[row][col] *= -1
-            else:
-                if tolerance > 0:
-                    prob = np.e**(-agreement/tolerance)
-                    event = np.random.rand()
-                    if prob > event:
-                        population[row][col] *= -1
+            
 
 	
 
@@ -116,7 +128,7 @@ def ising_main(population, alpha=1.0, external=0.0):
 
     # Iterating an update 100 times
     for frame in range(100):
-        for step in range(10):
+        for step in range(1000):
             ising_step(population, external, alpha)
         print('Step:', frame, end='\r')
         plot_ising(im, population)
@@ -133,6 +145,8 @@ def main():
                 elif args[i] == "-alpha":
                      i+=1
                      ising_main(random_pop(100, 100, 0.5), args[i])
+            else:
+                 ising_main(random_pop(100, 100, 0.5))
     
 	#You should write some code for handling flags here
 
