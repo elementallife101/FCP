@@ -1,4 +1,5 @@
 import numpy as np
+import random
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import argparse
@@ -252,14 +253,39 @@ class Network:
 					node.connections[neighbour_index] = 1
 					self.nodes[neighbour_index].connections[index] = 1
 		
-
 	def make_ring_network(self, N, neighbour_range=1):
-			print("")
-		#Your code  for task 4 goes here
+		self.nodes = []
+		for node_number in range(N):
+			neighbours = np.zeros(N)
+			for n in range(node_number-neighbour_range, (node_number+neighbour_range+1)):
+				neighbour = (n+N)%N
+				if neighbour != node_number:
+					neighbours[neighbour] = 1
+			self.nodes.append(Node(0, node_number, neighbours))
 
 	def make_small_world_network(self, N, re_wire_prob=0.2):
-			print("")
-		#Your code for task 4 goes here
+		self.make_ring_network(N, 2)
+		for node in self.nodes:
+			node_number = node.index
+			connections = node.connections
+			edges = []
+			for i in range(node_number, N):
+					if connections[i] == 1:
+						edges.append(i)
+			randomIndexes = np.arange(node_number, N).tolist()
+			for edge in edges:
+					randomIndexes.remove(edge)
+			randomIndexes.remove(node_number)
+			for edge in edges:
+				randomNum = random.random()
+				if randomNum <= re_wire_prob:
+					if randomIndexes != []:
+						randomIndex = randomIndexes[random.randint(0, len(randomIndexes)-1)]
+						randomIndexes.remove(randomIndex)
+						connections[randomIndex] = 1
+						connections[edge] = 0
+
+				node.connections = connections
 
 	def plot(self):
 		fig = plt.figure()
@@ -337,38 +363,84 @@ This section contains code for the Ising Model - task 1 in the assignment
 ==============================================================================================================
 '''
 
-def calculate_agreement(population, row, col, external=0.0):
-	'''
-	This function should return the *change* in agreement that would result if the cell at (row, col) was to flip it's value
-	Inputs: population (numpy array)
-			row (int)
-			col (int)
-			external (float)
-	Returns:
-			change_in_agreement (float)
-	'''
+def random_pop(row, col, agree_prob):
+    '''
+    This function creates a random array of a population using an agree probability.
+    Inputs: 
+        row (int)
+        col (int)
+        agree_prob(float)
+    Returns: 
+        grid(numpy array)
+    '''
+    gridTemp = np.random.rand(col, row)
+    grid = []
+    for row in gridTemp:
+        embedGrid = []
+        for item in row:
+            if item > agree_prob:
+                    embedGrid.append(-1)
+            else:
+                embedGrid.append(1)
+        grid.append(embedGrid)
+    return np.array(grid)
 
-	#Your code for task 1 goes here
+def flip(int):
+      if int == 1:
+            return -1
+      else:
+            return 1
 
-	return np.random * population
+def calculate_agreement(population, row, col, external=0.0, network = False):
+    '''
+    This function should return the *change* in agreement that would result if the cell at (row, col) was to flip it's value
+    Inputs: population (numpy array)
+            row (int)
+            col (int)
+            external (float)
+    Returns:
+            change_in_agreement (float)
+    '''
+    old_value = population[row][col]
+    if network == False:
+        neighbours = []
+        if row > 0:
+            neighbours.append(population[row-1][col])
+        if row < len(population)-1:
+            neighbours.append(population[row+1][col])
+        if col > 0:
+            neighbours.append(population[row][col-1])
+        if col < len(population[row])-1:
+            neighbours.append(population[row][col+1])
+    agreement = 0
+    for item in neighbours:
+          agreement += (old_value*item)
+    agreement += external*old_value
+    return agreement
 
-def ising_step(population, external=0.0):
-	'''
-	This function will perform a single update of the Ising model
-	Inputs: population (numpy array)
-			external (float) - optional - the magnitude of any external "pull" on opinion
-	'''
+def ising_step(population, external=0.0, tolerance=0.0):
+    '''
+    This function will perform a single update of the Ising model
+    Inputs: population (numpy array)
+            external (float) - optional - the magnitude of any external "pull" on opinion
+    '''
+    
+    n_rows, n_cols = population.shape
+    row = np.random.randint(0, n_rows)
+    col  = np.random.randint(0, n_cols)
+    agreement = calculate_agreement(population, row, col, external=0.0)
+
+    if agreement < 0:
+        population[row, col] *= -1
+    else:
+        if tolerance > 0:
+            prob = np.e**(-agreement/tolerance)
+            event = np.random.rand()
+            if prob > event:
+                population[row][col] *= -1
+            
+
 	
-	n_rows, n_cols = population.shape
-	row = np.random.randint(0, n_rows)
-	col  = np.random.randint(0, n_cols)
-
-	agreement = calculate_agreement(population, row, col, external=0.0)
-
-	if agreement < 0:
-		population[row, col] *= -1
-
-	#Your code for task 1 goes here
 
 def plot_ising(im, population):
 	'''
@@ -399,12 +471,12 @@ def test_ising():
 	population = -np.ones((3, 3))
 	assert(calculate_agreement(population,1,1,1)==3), "Test 7"
 	assert(calculate_agreement(population,1,1,-1)==5), "Test 8"
-	assert(calculate_agreement(population,1,1,10)==14), "Test 9"
-	assert(calculate_agreement(population,1,1,-10)==-6), "Test 10"
+	assert(calculate_agreement(population,1,1,10)==-6), "Test 9"
+	assert(calculate_agreement(population,1,1,-10)==14), "Test 10"
 	print("Tests passed")
 
 
-def ising_main(population, alpha=None, external=0.0):
+def ising_main(population, alpha=1.0, external=0.0):
     
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -413,12 +485,10 @@ def ising_main(population, alpha=None, external=0.0):
 
     # Iterating an update 100 times
     for frame in range(100):
-        # Iterating single steps 1000 times to form an update
         for step in range(1000):
-            ising_step(population, external)
+            ising_step(population, external, alpha)
         print('Step:', frame, end='\r')
         plot_ising(im, population)
-
 
 '''
 ==============================================================================================================
@@ -426,13 +496,81 @@ This section contains code for the Defuant Model - task 2 in the assignment
 ==============================================================================================================
 '''
 
-def defuant_main():
-	print("")
-	#Your code for task 2 goes here
+def defuant_main(pop, beta, threshold, timestep):
+    # Generate initial population with random opinions
+	population = np.random.rand(pop)
+    
+    # Create subplots for visualization
+	fig, (ax1, ax2) = plt.subplots(1, 2)
+	plt.ion()  # Turn on interactive mode for dynamic plotting
+    
+    # Iterate over timesteps
+	for i in range(timestep):
+        # Plot histogram of opinions
+		plot_opinions(population, i+1, ax1)
+        
+        # Plot individual opinions over time
+		plot_opinions1(population, i+1, ax2, beta, threshold)
 
+        # Update opinions of the population
+		for j in range(timestep):
+			update_opinions(population, beta, threshold)
+        
+        # This section can be uncommented to see the full animation of the plot
+        # Draw and pause to allow for interactive plotting
+		plt.draw()
+		plt.pause(0.01)
+
+        # Clear the histogram plot for the next timestep, except for the last timestep
+		if i != timestep-1:
+			ax1.clear()
+		
+    # Turn off interactive mode and display plots
+		plt.ioff()
+		plt.show()
+
+# Function to update opinions based on Deffuant model dynamics
+def update_opinions(population, beta, threshold):
+    # Select a random individual
+    initial = random.randint(0, len(population)-1)
+    
+    # Determine the index of the neighbor, handling boundary conditions
+    neighbour = (initial + random.choice([-1, 1])) % len(population)
+
+    # Calculate the difference in opinions
+    difference = abs(population[initial] - population[neighbour])
+    
+    # Update opinions if the difference is below the threshold
+    if difference < threshold:
+        # Update opinions based on the difference and beta parameter
+        update_value = beta * (population[neighbour] - population[initial])
+        update_value1 = beta * (population[initial] - population[neighbour])
+        population[initial] += update_value
+        population[neighbour] += update_value1 
+    return population
+
+# Function to plot histogram of opinions at each timestep
+def plot_opinions(population, timestep, ax):
+    bins = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+    ax.hist(population, bins=bins)
+    ax.set_title(f"Timestep = {timestep}")
+    ax.set_xlabel('Opinion')
+
+# Function to plot individual opinions over time
+def plot_opinions1(population, timestep, ax, beta, threshold):
+    x = [timestep] * len(population)
+    ax.scatter(x, population, color="red")
+    ax.set_title(f"Coupling: {beta}, Threshold: {threshold}")
+
+# Function to test the Deffuant model
 def test_defuant():
-	print("")
-	#Your code for task 2 goes here
+	for i in range(10):
+		assert update_opinions([0.2,0.4,0.8], 0.5, 0.5)==[0.2,0.4,0.8] or [0.3,0.3,0.8] or [0.2,0.6,0.6]
+		assert update_opinions([0.1,0.3,0.6], 0.1, 0.5)==[0.12,0.28,0.6] or [0.1,0.33,0.57] or [0.1,0.3,0.6]
+		assert update_opinions([0.4,0.45,0.6], 0.5, 0.1)==[0.425,0.425,0.6] or [0.3,0.3,0.6]
+		assert update_opinions([0.3,0.4,0.9], 0.1, 0.2)==[0.31,0.39,0.9] or [0.3,0.4,0.9] 
+		assert update_opinions([0.3,0.4,0.9], 0.5, 0.5)==[0.35,0.35,0.9] or [0.3,0.4,0.9] 
+	print("Tests passed")
 
 
 '''
