@@ -3,6 +3,9 @@
 Github Repository: https://github.com/elementallife101/FCP
 
 Description:
+In today's society, it is important to consider how opinions between different people spreads over time. For example, how a political view can shift over time or how social media's influence can vary over time. This is the key aim of opinion dynamics. Through different computational models, this allows us to more accurately predict how opinions can differ and what role social connections play in the outcomes that we observe in everyday society. Furthermore, this model as it helps with predicting future opinions, so would be useful for opinion surveys and expected results, such as the national polls, allowing for companies to react much faster to any anticipated outcomes, as these models allow us to predict larger opinion changes.
+
+Our model attempts to predict the different opinion changes present within a smaller network. As our assigned FCP summative assessment, we have modelled the opinion dynamics of people using several different models in order to examine how each model predicts the different attitudes over time. 
 
 Contents:
 - Task 1 (Ising Model)
@@ -45,7 +48,8 @@ Task 5 (Combining Models):
 - Required Dependencies
 - Flags
 
-How to use:
+Output Examples:
+
 
 Credits:
 Chenghe Tang - 
