@@ -582,30 +582,87 @@ This section contains code for the main function- you should write some code for
 def main():
 	# Handles flags using the module "Argparse".
     ## Optional arguments - Used for a random network and tests correspondingly.
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--network")
-    parser.add_argument("--test_network",action="store_true")
+	parser = argparse.ArgumentParser()
+	parser.add_argument("--network")
+	parser.add_argument("--test_network",action="store_true")
+
+	parser.add_argument("-ising_model", action="store_true")
+	parser.add_argument("-external", default=0.0, type=float)
+	parser.add_argument("-alpha", default=1.0, type=float)
+	parser.add_argument("-test_ising", action="store_true")
+
+	parser.add_argument("-defuant", action="store_true")
+	parser.add_argument("-beta", default=0.2, type=float)
+	parser.add_argument("-threshold", default=0.2, type=float)
+	parser.add_argument("-test_defuant", action="store_true")
 
     ## Optional argument - Used to help the user with understanding the structure of the network
-    parser.add_argument("--analysis",action="store_true")
-    args = parser.parse_args()
+	parser.add_argument("--analysis",action="store_true")
 
-    if args.network:
-        testing_network = Network()
-        testing_network.make_random_network(int(args.network),0.50)
+	parser.add_argument("-ring_network", default=0, type=int)
+	parser.add_argument("-small_world", default=0, type=int)
+	parser.add_argument("-re_wire", default=0.2, type=float)
 
-        testing_network.get_mean_degree()
-        testing_network.get_clustering()
-        testing_network.get_path_length()
+	args = parser.parse_args()
 
-    if args.test_network:
-        test_networks()
+	ising_pop = random_pop(100, 100, 0.5)
+	alpha = args.alpha
+	external = args.external
+
+	if args.ising_model:
+		ising_main(ising_pop, alpha, external)
+	
+	if args.test_ising:
+		test_ising()
+	
+	# Set default values for population size and timestep
+	pop = 100
+	timestep = 100
+
+	# Assign values of beta and threshold from command-line arguments
+	beta = args.beta
+	threshold = args.threshold
     
-    if args.analysis:
-        testing_network = Network()
-        testing_network.make_random_network(10,0.50)
+	# Check if the '-defuant' flag is provided
+	if args.defuant:
+        # Call the 'defuant_main' function with specified parameters
+		defuant_main(pop, beta, threshold, timestep)
+	if args.test_defuant:
+		test_defuant()
 
-        testing_network.analysis()
+	if args.network:
+		testing_network = Network()
+		testing_network.make_random_network(int(args.network),0.50)
+
+		testing_network.get_mean_degree()
+		testing_network.get_clustering()
+		testing_network.get_path_length()
+
+	if args.test_network:
+		test_networks()
+    
+	if args.analysis:
+		testing_network = Network()
+		testing_network.make_random_network(10,0.50)
+
+		testing_network.analysis()
+
+
+	ring_N = args.ring_network
+	if ring_N > 0:
+		ring_network = Network()
+		ring_network.make_ring_network(ring_N)
+		ring_network.plot()
+		plt.show()
+	
+	re_wire = args.re_wire
+	small_N = args.small_world
+	if small_N > 0:
+		small_network = Network()
+		small_network.make_small_world_network(small_N, re_wire)
+		small_network.plot()
+		plt.show()
+
 
 if __name__=="__main__":
 	main()
