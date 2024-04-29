@@ -1,4 +1,4 @@
-FCP Summative Assessment - Modelling Networks and Opinion Dynamics
+<h1> FCP Summative Assessment - Modelling Networks and Opinion Dynamics </h1>
 ------------------------------------------------------------------
 Github Repository: https://github.com/elementallife101/FCP
 
