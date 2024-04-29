@@ -1,6 +1,6 @@
 <h1> FCP Summative Assessment - Modelling Networks and Opinion Dynamics </h1>
-------------------------------------------------------------------
 Github Repository: https://github.com/elementallife101/FCP
+<br>
 
 Description:
 In today's society, it is important to consider how opinions between different people spreads over time. For example, how a political view can shift over time or how social media's influence can vary over time. This is the key aim of opinion dynamics. Through different computational models, this allows us to more accurately predict how opinions can differ and what role social connections play in the outcomes that we observe in everyday society. Furthermore, this model as it helps with predicting future opinions, so would be useful for opinion surveys and expected results, such as the national polls, allowing for companies to react much faster to any anticipated outcomes, as these models allow us to predict larger opinion changes.
