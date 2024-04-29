@@ -34,7 +34,7 @@ def flip(int):
       else:
             return 1
 
-def calculate_agreement(population, row, col, external=0.0):
+def calculate_agreement(population, row, col, external=0.0, network = False):
     '''
     This function should return the *change* in agreement that would result if the cell at (row, col) was to flip it's value
     Inputs: population (numpy array)
@@ -45,16 +45,16 @@ def calculate_agreement(population, row, col, external=0.0):
             change_in_agreement (float)
     '''
     old_value = population[row][col]
-    neighbours = []
-    if row > 0:
-         neighbours.append(population[row-1][col])
-    if row < len(population)-1:
-         neighbours.append(population[row+1][col])
-    if col > 0:
-         neighbours.append(population[row][col-1])
-    if col < len(population[row])-1:
-         neighbours.append(population[row][col+1])
-    
+    if network == False:
+        neighbours = []
+        if row > 0:
+            neighbours.append(population[row-1][col])
+        if row < len(population)-1:
+            neighbours.append(population[row+1][col])
+        if col > 0:
+            neighbours.append(population[row][col-1])
+        if col < len(population[row])-1:
+            neighbours.append(population[row][col+1])
     agreement = 0
     for item in neighbours:
           agreement += (old_value*item)
