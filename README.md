@@ -22,7 +22,18 @@ How to install:
 
 Task 1 (Ising Model):
 - Required Dependencies
+	-Argparse
+	-Numpy
+	-Matplotlib
 - Flags
+	- -ising_model
+		This argument generates a random population and runs the ising model, plotting the results.
+	- -alpha (Type:int)
+		This argument gives a value for the "alpha" variable used in the ising_model to represent the tolerance of society to those who disagree with their neighbours. If left out, the value will default to 1.0.
+	- -external (Type:int)
+		This argument gives a value for the external pull on opinions. If left out, the value will default to 0.0.
+	- -test_ising
+		This argument runs through the tests provided to show whether the ising model is working as intended.
 
 Task 2 (Defuant Model):
 - Required Dependencies
@@ -33,16 +44,25 @@ Task 3 (Networks):
 	- Argparse (Install Link: https://pypi.org/project/argparse/)
 	- Numpy (Install Link: https://numpy.org/install/)
 - Flags
-	- --network <size(Type:int)>
+	- -network <size(Type:int)>
 		This argument generates a random network of the specified size. It then calculates and returns the mean degree, the mean clustering coefficient and mean path length of the 		randomly generated network.
-	- --test_network 
+	- -test_network 
 		This argument runs through the test assertions which were provided within the specification to ensure that the module is completing the intended operation.
-	- --analysis
+	- -analysis
 		This argument is designed to help users visualise the data structures and formats present within the code. When called, it returns each node and the connections it has for 		a random network of size 10.
 
 Task 4 (Small World Networks):
 - Required Dependencies
+	-Argparse
+	-Numpy
+	-Matplotlib
 - Flags
+	- -ring_network <size(Type:int)>
+		This argument creates a ring network of the specified size. It then plots this network.
+	- -small_world <size(Type:int)>
+		This argument creates a small world network of the specified size and re-wire probability, it then plots this network.
+	- -re_wire (Type:int)
+		This argument gives a value for the re-wire probability of the small world network. If left out, the value will default to 0.2.
 
 Task 5 (Combining Models):
 - Required Dependencies
