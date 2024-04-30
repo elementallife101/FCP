@@ -583,8 +583,8 @@ def main():
 	# Handles flags using the module "Argparse".
     ## Optional arguments - Used for a random network and tests correspondingly.
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--network")
-	parser.add_argument("--test_network",action="store_true")
+	parser.add_argument("-network")
+	parser.add_argument("-test_network",action="store_true")
 
 	parser.add_argument("-ising_model", action="store_true")
 	parser.add_argument("-external", default=0.0, type=float)
@@ -597,7 +597,7 @@ def main():
 	parser.add_argument("-test_defuant", action="store_true")
 
     ## Optional argument - Used to help the user with understanding the structure of the network
-	parser.add_argument("--analysis",action="store_true")
+	parser.add_argument("-analysis",action="store_true")
 
 	parser.add_argument("-ring_network", default=0, type=int)
 	parser.add_argument("-small_world", default=0, type=int)
