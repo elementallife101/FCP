@@ -336,6 +336,12 @@ class Network:
 					neighbour_y = network_radius * np.sin(neighbour_angle)
 					ax.plot((node_x, neighbour_x), (node_y, neighbour_y), color='black')
 
+	 def print_connections(self):
+        	for node in self.nodes:
+            		connected_nodes = [i for i, connected in enumerate(node.connections) if connected == 1]
+            	
+
+
 def test_networks():
 
 	#Ring network
