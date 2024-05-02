@@ -162,7 +162,6 @@ class Network:
 				Returns:
 					len(route) (Type: int) - Represents the length of the shortest route between the starting node and the goal node.
 				"""
-				
 				search_queue = Queue()
 				search_queue.push(start_node)
 				visited = []
@@ -179,6 +178,8 @@ class Network:
 			
 					#If not, we need to add all the neighbours of the current node to the search queue. 
 					#Start by looping through all the neighbours
+					#print("Index",node_to_check.index)
+					#print("get_neighbours()",node_to_check.get_neighbours(),"\n")
 					for neighbour_index in node_to_check.get_neighbours():
 						#Get a node based on the index
 						neighbour = network[neighbour_index]
@@ -189,21 +190,26 @@ class Network:
 							visited.append(neighbour_index)
 							#Set the parent property to allow for backtracking.
 							neighbour.parent = node_to_check
-			
+				#for nodal in network:
+					#print("Node",nodal)
+					#print("Node.value",str(nodal.value))
+					#print("Node.number",str(nodal.index))
+					#print("Node.connections",str(nodal.connections)+"\n") 			
 				#Now we've found the goal node, we need to backtrace to get the path. 
 				#We start at the goal.
 				node_to_check = goal
+				#print("Starting Index", start_node.index)
+				#print("Ending Index",node_to_check.index)
 				#We make sure the start node has no parent.
 				start_node.parent = None
 				route = []
-			
+				#print("node_to_check.parent",node_to_check.parent)
 				#Loop over node parents until we reach the start.
 				while node_to_check.parent:
 					#Add node to our route
 					route.append(node_to_check)
 					#Update node to be the parent of our current node
 					node_to_check = node_to_check.parent
-
 				route = [node.value for node in route[::-1]]
 				return len(route)
 			
@@ -215,8 +221,13 @@ class Network:
 			for node in self.nodes:
 				path_length = []
 				for neighbour in self.nodes:
-					if neighbour != node:
-						path_length.append(breadth_first_search(self.nodes,node, neighbour))
+					## If there is no connections, continue.
+					try:
+						if neighbour != node:
+							path_length.append(breadth_first_search(self.nodes,node, neighbour))
+
+					except AttributeError:
+						continue
 
 				average_path_length.append(mean(path_length))
 
