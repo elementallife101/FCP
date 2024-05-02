@@ -265,37 +265,53 @@ class Network:
 					self.nodes[neighbour_index].connections[index] = 1
 		
 	def make_ring_network(self, N, neighbour_range=1):
+		'''
+		Creates a ring network of size N where neighbours are connected to each other with range neighbour_range. 
+		'''
 		self.nodes = []
+		#cycles through each node to be created, creates an empty list of neighbours
 		for node_number in range(N):
 			neighbours = np.zeros(N)
+			#adds the each neighbour rto the list using a forloop
 			for n in range(node_number-neighbour_range, (node_number+neighbour_range+1)):
 				neighbour = (n+N)%N
+				#excludes self-connections
 				if neighbour != node_number:
 					neighbours[neighbour] = 1
 			self.nodes.append(Node(0, node_number, neighbours))
 
 	def make_small_world_network(self, N, re_wire_prob=0.2):
+		'''
+		Creates a small world network of size N where each connection is re-wired with a probability re_wire_prob
+		'''
 		self.make_ring_network(N, 2)
+		#creates a ring network with a range of 2 as a base
+
 		for node in self.nodes:
 			node_number = node.index
 			connections = node.connections
 			edges = []
+			#iterates through each node, initialises a list of the edges it connects to
 			for i in range(node_number, N):
 					if connections[i] == 1:
 						edges.append(i)
+					#the edges list contains all nodes which connect to the target node, excluding those with lower indexes as these would have already been checked on previous iterations
 			randomIndexes = np.arange(node_number, N).tolist()
 			for edge in edges:
 					randomIndexes.remove(edge)
 			randomIndexes.remove(node_number)
+			#randomIndexes is the list of edges from the target node which an edge can be moved to when it is re-wired. It contains all of the nodes in the network excluding those which the target node already connects to and the target node itself.
 			for edge in edges:
 				randomNum = random.random()
 				if randomNum <= re_wire_prob:
+					#iterates through each of the edges, generates a random number which is checked against the re-wire probability to see if it should be re-wired.
 					if randomIndexes != []:
 						randomIndex = randomIndexes[random.randint(0, len(randomIndexes)-1)]
 						randomIndexes.remove(randomIndex)
+						randomIndexes.append(edge)
 						connections[randomIndex] = 1
 						connections[edge] = 0
-
+						#if there are nodes for the target edge to be re-wired to, picks a random index from RandomIndexes, sets that connection to 1, sets the original edge to 0, adds the target edge back to randomIndexes as other edges can now be re-wired to it.
 				node.connections = connections
 
 	def plot(self):
@@ -389,45 +405,51 @@ def random_pop(row, col, agree_prob):
     for row in gridTemp:
         embedGrid = []
         for item in row:
+			#creates random array, iterates through each item in the array
             if item > agree_prob:
                     embedGrid.append(-1)
             else:
                 embedGrid.append(1)
+			#if each item in the list is greater than the agree probability, it is set to disagree, otherwise it is set to agree.
         grid.append(embedGrid)
     return np.array(grid)
 
-def flip(int):
-      if int == 1:
-            return -1
-      else:
-            return 1
-
-def calculate_agreement(population, row, col, external=0.0, network = False):
-    '''
-    This function should return the *change* in agreement that would result if the cell at (row, col) was to flip it's value
-    Inputs: population (numpy array)
-            row (int)
-            col (int)
-            external (float)
-    Returns:
-            change_in_agreement (float)
-    '''
-    old_value = population[row][col]
-    if network == False:
-        neighbours = []
-        if row > 0:
-            neighbours.append(population[row-1][col])
-        if row < len(population)-1:
-            neighbours.append(population[row+1][col])
-        if col > 0:
-            neighbours.append(population[row][col-1])
-        if col < len(population[row])-1:
-            neighbours.append(population[row][col+1])
-    agreement = 0
-    for item in neighbours:
-          agreement += (old_value*item)
-    agreement += external*old_value
-    return agreement
+def calculate_agreement(population, row, col, external=0.0):
+	'''
+	This function should return the *change* in agreement that would result if the cell at (row, col) was to flip it's value
+	Inputs: population (numpy array)
+			row (int)
+			col (int)
+			external (float)
+	Returns:
+			change_in_agreement (float)
+	'''
+	old_value = population[row][col]
+	neighbours = []
+	if row > 0:
+		neighbours.append(population[row-1][col])
+	else:
+		neighbours.append(population[row][col])
+	if row < len(population)-1:
+		neighbours.append(population[row+1][col])
+	else:
+		neighbours.append(population[0][col])
+	if col > 0:
+		neighbours.append(population[row][col-1])
+	else:
+		neighbours.append(population[row][col])
+	if col < len(population[row])-1:
+		neighbours.append(population[row][col+1])
+	else:
+		neighbours.append(population[row][0])
+	#finds the neighbours for the target cell. If the target cell is on any of the edges of the population grid, its neighbour will be on the opposite edge.
+ 
+	agreement = 0
+	for item in neighbours:
+		agreement += (old_value*item)
+	agreement += external*old_value
+	#calculates the agreement using each of the neighbouts and the cell's previous value.
+	return agreement
 
 def ising_step(population, external=0.0, tolerance=0.0):
     '''
@@ -439,16 +461,19 @@ def ising_step(population, external=0.0, tolerance=0.0):
     n_rows, n_cols = population.shape
     row = np.random.randint(0, n_rows)
     col  = np.random.randint(0, n_cols)
-    agreement = calculate_agreement(population, row, col, external=0.0)
+    agreement = calculate_agreement(population, row, col, external)
+	#picks a random cell in the population grid, calculates its agreement
 
     if agreement < 0:
         population[row, col] *= -1
+	#if the agreement is negative, flips the value of the cell
     else:
         if tolerance > 0:
             prob = np.e**(-agreement/tolerance)
             event = np.random.rand()
             if prob > event:
                 population[row][col] *= -1
+	#if the agreement is positive or 0, flips the value at a probability calculated using the agreement and tolerance
             
 
 	
@@ -594,8 +619,8 @@ def main():
 	# Handles flags using the module "Argparse".
     ## Optional arguments - Used for a random network and tests correspondingly.
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--network")
-	parser.add_argument("--test_network",action="store_true")
+	parser.add_argument("-network")
+	parser.add_argument("-test_network",action="store_true")
 
 	parser.add_argument("-ising_model", action="store_true")
 	parser.add_argument("-external", default=0.0, type=float)
@@ -608,7 +633,7 @@ def main():
 	parser.add_argument("-test_defuant", action="store_true")
 
     ## Optional argument - Used to help the user with understanding the structure of the network
-	parser.add_argument("--analysis",action="store_true")
+	parser.add_argument("-analysis",action="store_true")
 
 	parser.add_argument("-ring_network", default=0, type=int)
 	parser.add_argument("-small_world", default=0, type=int)
