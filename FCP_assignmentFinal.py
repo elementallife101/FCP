@@ -648,9 +648,7 @@ def defuant_main(pop, beta, threshold, timestep):
 			update_opinions(population, beta, threshold)
 		
 		# This section can be uncommented to see the full animation of the plot
-		# Draw and pause to allow for interactive plotting
-		plt.draw()
-		plt.pause(0.01)
+		
 
 		# Clear the histogram plot for the next timestep, except for the last timestep
 		if i != timestep-1:
@@ -658,7 +656,7 @@ def defuant_main(pop, beta, threshold, timestep):
 		
 	# Turn off interactive mode and display plots
 		plt.ioff()
-		plt.show()
+	plt.show()
 
 # Function to update opinions based on Deffuant model dynamics
 def update_opinions(population, beta, threshold):
