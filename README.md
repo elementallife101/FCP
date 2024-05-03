@@ -43,8 +43,6 @@ Task 2 (Defuant Model):
   	-random
 - Flags
         -defuant <>
-   		If we use the flag "- use_network<size(Type:int)>" at the same thime, his argument plots the animation of the network with specified size over timesteps and the mean opinion over timesteps.
-  		Else, we default to use random network
 
 Task 3 (Networks):
 - Required Dependencies
