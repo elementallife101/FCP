@@ -361,15 +361,16 @@ class Network:
 					neighbour_y = network_radius * np.sin(neighbour_angle)
 					ax.plot((node_x, neighbour_x), (node_y, neighbour_y), color='black')		
 		plt.savefig(f"frame_{i:03d}.png")
-    		plt.close()
+		#here
+		plt.close()
 
-	#Task5
-	def get_connections_list(self):
-        	connections_list = []
-        	for node in self.nodes:
-            		connected_nodes = [i for i, connected in enumerate(node.connections) if connected == 1]
-            		connections_list.append(connected_nodes)
-        return connections_list
+		#Task5
+		def get_connections_list(self):
+			connections_list = []
+			for node in self.nodes:
+					connected_nodes = [i for i, connected in enumerate(node.connections) if connected == 1]
+					connections_list.append(connected_nodes)
+		return connections_list
 
 
 
@@ -571,7 +572,7 @@ This section contains code for the Defuant Model - task 2 in the assignment
 
 def defuant_main(pop, beta, threshold, timestep, node_amount):
 	#Task 2
-	if node_amount = 0:
+	if node_amount == 0:
 	
             # Generate initial population with random opinions
 		population = np.random.rand(pop)
@@ -727,7 +728,7 @@ def main():
 	parser.add_argument("-small_world", default=0, type=int)
 	parser.add_argument("-re_wire", default=0.2, type=float)
 
-	 parser.add_argument('-use_network', type=int)
+	parser.add_argument('-use_network', type=int)
 
 	args = parser.parse_args()
 
@@ -751,17 +752,17 @@ def main():
 	# Assign values of beta and threshold from command-line arguments
 	beta = args.beta
 	threshold = args.threshold
-    	
+		
 	if args.use_network:
-        	node_amount = args.use_network
+			node_amount = args.use_network
 		
 	# Check if the '-defuant' flag is provided
 	if args.defuant:
-       		defuant_main(pop, beta, threshold, timestep, node_amount) # Call the 'defuant_main' function with specified parameters
-	
+			defuant_main(pop, beta, threshold, timestep, node_amount) # Call the 'defuant_main' function with specified parameters
+
 	if args.test_defuant:
 		test_defuant()
-	
+
 	if args.network:
 		testing_network = Network()
 		testing_network.make_random_network(int(args.network),0.50)
