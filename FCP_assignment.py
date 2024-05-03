@@ -1,8 +1,9 @@
-import numpy as np
+	import numpy as np
 import random
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import argparse
+import imageio
 
 """
 Modules
@@ -326,7 +327,7 @@ class Network:
 			node_angle = i * 2 * np.pi / num_nodes
 			node_x = network_radius * np.cos(node_angle)
 			node_y = network_radius * np.sin(node_angle)
-
+	
 			circle = plt.Circle((node_x, node_y), 0.3*num_nodes, color=cm.hot(node.value))
 			ax.add_patch(circle)
 			for neighbour_index in range(i+1, num_nodes):
@@ -335,8 +336,34 @@ class Network:
 					neighbour_x = network_radius * np.cos(neighbour_angle)
 					neighbour_y = network_radius * np.sin(neighbour_angle)
 					ax.plot((node_x, neighbour_x), (node_y, neighbour_y), color='black')
+
+	#Chenghe's part for Task5
+	def plot_world(self, population, i):
+		nodes = [Node(value, index) for index, value in enumerate(population)]
+		fig = plt.figure()
+		ax = fig.add_subplot(111)
+		ax.set_axis_off()
+		num_nodes = len(self.nodes)
+		network_radius = num_nodes * 10
+		ax.set_xlim([-1.1*network_radius, 1.1*network_radius])
+		ax.set_ylim([-1.1*network_radius, 1.1*network_radius])
+		for (i, node) in enumerate(self.nodes):
+			node_angle = i * 2 * np.pi / num_nodes
+			node_x = network_radius * np.cos(node_angle)
+			node_y = network_radius * np.sin(node_angle)
 	
-	#Chenghe's part for Task 5
+			circle = plt.Circle((node_x, node_y), 0.3*num_nodes, color=cm.hot(node.value))
+			ax.add_patch(circle)
+			for neighbour_index in range(i+1, num_nodes):
+				if node.connections[neighbour_index]:
+					neighbour_angle = neighbour_index * 2 * np.pi / num_nodes
+					neighbour_x = network_radius * np.cos(neighbour_angle)
+					neighbour_y = network_radius * np.sin(neighbour_angle)
+					ax.plot((node_x, neighbour_x), (node_y, neighbour_y), color='black')		
+		plt.savefig(f"frame_{i:03d}.png")
+    		plt.close()
+
+	#Task5
 	def get_connections_list(self):
         	connections_list = []
         	for node in self.nodes:
@@ -542,37 +569,70 @@ This section contains code for the Defuant Model - task 2 in the assignment
 ==============================================================================================================
 '''
 
-def defuant_main(pop, beta, threshold, timestep):
-    # Generate initial population with random opinions
-	population = np.random.rand(pop)
-    
-    # Create subplots for visualization
-	fig, (ax1, ax2) = plt.subplots(1, 2)
-	plt.ion()  # Turn on interactive mode for dynamic plotting
-    
-    # Iterate over timesteps
-	for i in range(timestep):
-        # Plot histogram of opinions
-		plot_opinions(population, i+1, ax1)
-        
-        # Plot individual opinions over time
-		plot_opinions1(population, i+1, ax2, beta, threshold)
-
-        # Update opinions of the population
-		for j in range(timestep):
-			update_opinions(population, beta, threshold)
-        
-        # This section can be uncommented to see the full animation of the plot
-        # Draw and pause to allow for interactive plotting
-		plt.draw()
-		plt.pause(0.01)
-
-        # Clear the histogram plot for the next timestep, except for the last timestep
-		if i != timestep-1:
-			ax1.clear()
+def defuant_main(pop, beta, threshold, timestep, node_amount):
+	#Task 2
+	if node_amount = 0:
+	
+            # Generate initial population with random opinions
+		population = np.random.rand(pop)
+	    
+	    # Create subplots for visualization
+		fig, (ax1, ax2) = plt.subplots(1, 2)
+		plt.ion()  # Turn on interactive mode for dynamic plotting
+	    
+	    # Iterate over timesteps
+		for i in range(timestep):
+	        # Plot histogram of opinions
+			plot_opinions(population, i+1, ax1)
+	        
+	        # Plot individual opinions over time
+			plot_opinions1(population, i+1, ax2, beta, threshold)
+	
+	        # Update opinions of the population
+			for j in range(timestep):
+				update_opinions(population, beta, threshold)
+	        
+	        # This section can be uncommented to see the full animation of the plot
+	        # Draw and pause to allow for interactive plotting
+			plt.draw()
+			plt.pause(0.01)
+	
+	        # Clear the histogram plot for the next timestep, except for the last timestep
+			if i != timestep-1:
+				ax1.clear()
+			
+	    # Turn off interactive mode and display plots
+			plt.ioff()
+			plt.show()
+	#Task 5
+	else :
+		population = np.random.rand(node_amount)
+		defuant_small = Network()
+		defuant_small.make_small_world_network(node_amount, 0.2)
+		defuant_list = defuant_small.get_connections_list()
+		images = []
+		mean = 0
+		mean_list = []
+		for i in range (1, timestep):
+			
+			for j in range (0, node_amount-1):
+				mean = mean + population[j] / node_amount
+				mean_list[].append(mean)
+			
+			defuant_small.plot_world(population, i)
+			
+			images.append(imageio.imread(f"frame_{i:03d}.png"))
+			
+			update_defuant_world(population, beta, threshold, defuant_list)
 		
-    # Turn off interactive mode and display plots
-		plt.ioff()
+		imageio.mimsave('small_world.gif', images, fps=10)
+		
+		plt.figure(figsize=(10, 5))
+		plt.plot(mean_list[], marker='o')
+		plt.title('Mean opinion over time')
+		plt.xlabel('Timestep')
+		plt.ylabel('Mean opinion')
+		plt.grid(True)
 		plt.show()
 
 # Function to update opinions based on Deffuant model dynamics
@@ -594,6 +654,24 @@ def update_opinions(population, beta, threshold):
         population[initial] += update_value
         population[neighbour] += update_value1 
     return population
+
+# Function by using small world network
+def update_defuant_world(population, beta, threshold, connections_list):
+
+	initial = random.randint(0, len(population) - 1)
+
+	neighbour = connections_list[random_index]
+
+	difference = abs(population[initial] - population[neighbour])
+
+	# Update opinions if the difference is below the threshold
+	if difference < threshold:
+		# Update opinions based on the difference and beta parameter
+		update_value = beta * (population[neighbour] - population[initial])
+		update_value1 = beta * (population[initial] - population[neighbour])
+		population[initial] += update_value
+		population[neighbour] += update_value1
+	return population
 
 # Function to plot histogram of opinions at each timestep
 def plot_opinions(population, timestep, ax):
@@ -649,6 +727,8 @@ def main():
 	parser.add_argument("-small_world", default=0, type=int)
 	parser.add_argument("-re_wire", default=0.2, type=float)
 
+	 parser.add_argument('-use_network', type=int)
+
 	args = parser.parse_args()
 
 	ising_pop = random_pop(100, 100, 0.5)
@@ -664,18 +744,24 @@ def main():
 	# Set default values for population size and timestep
 	pop = 100
 	timestep = 100
+	#Task 5 default assumption
+	node_amount = 0
+	
 
 	# Assign values of beta and threshold from command-line arguments
 	beta = args.beta
 	threshold = args.threshold
-    
+    	
+	if args.use_network:
+        	node_amount = args.use_network
+		
 	# Check if the '-defuant' flag is provided
 	if args.defuant:
-        # Call the 'defuant_main' function with specified parameters
-		defuant_main(pop, beta, threshold, timestep)
+       		defuant_main(pop, beta, threshold, timestep, node_amount) # Call the 'defuant_main' function with specified parameters
+	
 	if args.test_defuant:
 		test_defuant()
-
+	
 	if args.network:
 		testing_network = Network()
 		testing_network.make_random_network(int(args.network),0.50)
@@ -692,6 +778,8 @@ def main():
 		testing_network.make_random_network(10,0.50)
 
 		testing_network.analysis()
+
+	
 
 
 	ring_N = args.ring_network
