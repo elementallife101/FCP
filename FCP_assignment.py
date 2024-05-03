@@ -3,43 +3,42 @@ import random
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import argparse
-import imageio
 
 """
 Modules
 -------
 numpy - Useful for data structures
-        Documentation: https://numpy.org/doc/stable/
+		Documentation: https://numpy.org/doc/stable/
 
 matplotlib.pyplot - Useful for plotting
-                    Documentation: https://matplotlib.org/stable/api/pyplot_summary.html
+					Documentation: https://matplotlib.org/stable/api/pyplot_summary.html
 
 matplotlib.cm - Useful for plotting coloured maps
-                Documentation: https://matplotlib.org/stable/api/cm_api.html
+				Documentation: https://matplotlib.org/stable/api/cm_api.html
 
 argparse - Useful for handling arguments
-           Documentation: https://docs.python.org/3/library/argparse.html
+		   Documentation: https://docs.python.org/3/library/argparse.html
 """
 
 ## Created by Tycho for Task 3.
 def mean(number_list):
-    total = 0
-    for number in number_list:
-        total += number
-    result = total / len(number_list)
-    return result
+	total = 0
+	for number in number_list:
+		total += number
+	result = total / len(number_list)
+	return result
 
 ## Preexisting Class - Used in Block 4.
 class Queue:
-    def __init__(self):
-        self.queue = []
-    def push(self, item):
-        self.queue.insert(0, item)
-        return self.queue
-    def pop(self):
-        return self.queue.pop()
-    def is_empty(self):
-        return len(self.queue)==0
+	def __init__(self):
+		self.queue = []
+	def push(self, item):
+		self.queue.insert(0, item)
+		return self.queue
+	def pop(self):
+		return self.queue.pop()
+	def is_empty(self):
+		return len(self.queue)==0
 	
 class Node:
 	def __init__(self, value, number, connections=None):
@@ -47,13 +46,13 @@ class Node:
 		self.connections = connections
 		self.value = value
 
-        
+		
 		## Created by Tycho for Task 3.
 		self.new_connections = 0
 
 	def get_neighbours(self):
 		return np.where(np.array(self.connections)==1)[0]
-           
+		   
 class Network:
 	def __init__(self, nodes=None):
 		if nodes is None:
@@ -327,7 +326,7 @@ class Network:
 			node_angle = i * 2 * np.pi / num_nodes
 			node_x = network_radius * np.cos(node_angle)
 			node_y = network_radius * np.sin(node_angle)
-	
+
 			circle = plt.Circle((node_x, node_y), 0.3*num_nodes, color=cm.hot(node.value))
 			ax.add_patch(circle)
 			for neighbour_index in range(i+1, num_nodes):
@@ -337,12 +336,10 @@ class Network:
 					neighbour_y = network_radius * np.sin(neighbour_angle)
 					ax.plot((node_x, neighbour_x), (node_y, neighbour_y), color='black')
 
-	#Chenghe's part for Task5
-	def plot_world(self, population, i):
-		nodes = [Node(value, index) for index, value in enumerate(population)]
-		fig = plt.figure()
-		ax = fig.add_subplot(111)
-		ax.set_axis_off()
+	def ising_plot(self, fig, ax):
+		'''
+		Version of the plot method used in task 5 for plotting the ising model on the network as it develops. The same as the plot method except that the figure and axis are the same for each plot so are passed as arguments. The node's colour also changes differently depending on its value.
+		'''
 		num_nodes = len(self.nodes)
 		network_radius = num_nodes * 10
 		ax.set_xlim([-1.1*network_radius, 1.1*network_radius])
@@ -351,27 +348,18 @@ class Network:
 			node_angle = i * 2 * np.pi / num_nodes
 			node_x = network_radius * np.cos(node_angle)
 			node_y = network_radius * np.sin(node_angle)
-	
-			circle = plt.Circle((node_x, node_y), 0.3*num_nodes, color=cm.hot(node.value))
+			if node.value == 1: 
+				colour = "blue"
+			else:
+				colour = "red"
+			circle = plt.Circle((node_x, node_y), 0.3*num_nodes, color=colour)
 			ax.add_patch(circle)
 			for neighbour_index in range(i+1, num_nodes):
 				if node.connections[neighbour_index]:
 					neighbour_angle = neighbour_index * 2 * np.pi / num_nodes
 					neighbour_x = network_radius * np.cos(neighbour_angle)
 					neighbour_y = network_radius * np.sin(neighbour_angle)
-					ax.plot((node_x, neighbour_x), (node_y, neighbour_y), color='black')		
-		plt.savefig(f"frame_{i:03d}.png")
-    		plt.close()
-
-	#Task5
-	def get_connections_list(self):
-        	connections_list = []
-        	for node in self.nodes:
-            		connected_nodes = [i for i, connected in enumerate(node.connections) if connected == 1]
-            		connections_list.append(connected_nodes)
-        return connections_list
-
-
+					ax.plot((node_x, neighbour_x), (node_y, neighbour_y), color='black')
 
 def test_networks():
 
@@ -428,28 +416,36 @@ This section contains code for the Ising Model - task 1 in the assignment
 '''
 
 def random_pop(row, col, agree_prob):
-    '''
-    This function creates a random array of a population using an agree probability.
-    Inputs: 
-        row (int)
-        col (int)
-        agree_prob(float)
-    Returns: 
-        grid(numpy array)
-    '''
-    gridTemp = np.random.rand(col, row)
-    grid = []
-    for row in gridTemp:
-        embedGrid = []
-        for item in row:
+	'''
+	This function creates a random array of a population using an agree probability.
+	Inputs: 
+		row (int)
+		col (int)
+		agree_prob(float)
+	Returns: 
+		grid(numpy array)
+	'''
+	gridTemp = np.random.rand(col, row)
+	grid = []
+	for row in gridTemp:
+		embedGrid = []
+		for item in row:
 			#creates random array, iterates through each item in the array
-            if item > agree_prob:
-                    embedGrid.append(-1)
-            else:
-                embedGrid.append(1)
+			if item > agree_prob:
+					embedGrid.append(-1)
+			else:
+				embedGrid.append(1)
 			#if each item in the list is greater than the agree probability, it is set to disagree, otherwise it is set to agree.
-        grid.append(embedGrid)
-    return np.array(grid)
+		grid.append(embedGrid)
+	return np.array(grid)
+
+def agreement_calc(old_value, neighbours, external):
+	agreement = 0
+	for item in neighbours:
+		agreement += (old_value*item)
+	agreement += external*old_value
+	#calculates the agreement using each of the neighbouts and the cell's previous value.
+	return agreement
 
 def calculate_agreement(population, row, col, external=0.0):
 	'''
@@ -480,40 +476,75 @@ def calculate_agreement(population, row, col, external=0.0):
 	else:
 		neighbours.append(population[row][0])
 	#finds the neighbours for the target cell. If the target cell is on any of the edges of the population grid, its neighbour will be on the opposite edge.
- 
-	agreement = 0
-	for item in neighbours:
-		agreement += (old_value*item)
-	agreement += external*old_value
-	#calculates the agreement using each of the neighbouts and the cell's previous value.
+	agreement = agreement_calc(old_value, neighbours, external)
 	return agreement
 
-def ising_step(population, external=0.0, tolerance=0.0):
-    '''
-    This function will perform a single update of the Ising model
-    Inputs: population (numpy array)
-            external (float) - optional - the magnitude of any external "pull" on opinion
-    '''
-    
-    n_rows, n_cols = population.shape
-    row = np.random.randint(0, n_rows)
-    col  = np.random.randint(0, n_cols)
-    agreement = calculate_agreement(population, row, col, external)
+def network_agreement(network, node, external=0.0):
+	'''
+	Calculates the change in agreement for a single node in a network using the opinions and its neighbours. Takes the node and network as well as the external pull on opinions as parameters, returns the change in agreement.
+	'''
+	neighbour_indexes = [i for i in range(0, len(node.connections)) if node.connections[i] == 1]
+	old_value = node.value
+	neighbours = [network.nodes[neighbour].value for neighbour in neighbour_indexes]
+	agreement = agreement_calc(old_value, neighbours, external)
+	return agreement
+
+def ising_step(population, external=0.0, tolerance=1.0):
+	'''
+	This function will perform a single update of the Ising model
+	Inputs: population (numpy array)
+			external (float) - optional - the magnitude of any external "pull" on opinion
+			tolerance (float) -optional - the tolerance of the society to those who have different opinions to their neighbours
+	'''
+	n_rows, n_cols = population.shape
+	row = np.random.randint(0, n_rows)
+	col  = np.random.randint(0, n_cols)
+	agreement = calculate_agreement(population, row, col, external)
 	#picks a random cell in the population grid, calculates its agreement
-
-    if agreement < 0:
-        population[row, col] *= -1
-	#if the agreement is negative, flips the value of the cell
-    else:
-        if tolerance > 0:
-            prob = np.e**(-agreement/tolerance)
-            event = np.random.rand()
-            if prob > event:
-                population[row][col] *= -1
-	#if the agreement is positive or 0, flips the value at a probability calculated using the agreement and tolerance
-            
-
 	
+	if agreement < 0:
+		population[row, col] *= -1
+	#if the agreement is negative, flips the value of the cell
+	else:
+		if tolerance > 0:
+			prob = np.e**(-agreement/tolerance)
+			event = np.random.rand()
+			if prob > event:
+				population[row][col] *= -1
+	#if the agreement is positive or 0, flips the value at a probability calculated using the agreement and tolerance
+ 
+def network_ising_step(network, external=0.0, tolerance=1.0):
+	'''
+	Performs a single step of the ising model on a network. Randomly selects a node and updates its value based on its agreement with its neighbours. Returns the mean opinion of the network so this can be trakced over time. 
+	'''
+	node = network.nodes[random.randint(0, len(network.nodes)-1)]
+	agreement = network_agreement(network, node, external)
+	#randomly selects a node and calculates its agreement
+
+	if agreement < 0:
+		node.value *=-1
+	else:
+		if tolerance > 0:
+			prob = np.e**(-agreement/tolerance)
+			event = np.random.rand()
+			if prob > event:
+				node.value *= -1
+	#uses identical logic to the ising_step() function but updates a node's value instead of an array item's value
+	opinions = [node.value for node in network.nodes]
+	mean_opinion = mean(opinions)
+	#calculates the mean opinion of the network
+	return mean_opinion
+
+def add_agreement(population):
+	'''
+	Assigns agree (1) or disagree (-1) values to each node in a network randomly.
+	'''
+	for node in population.nodes:
+		random_num = random.randint(0, 1)
+		if random_num == 0:
+			random_num = -1
+		node.value = random_num
+		
 
 def plot_ising(im, population):
 	'''
@@ -549,19 +580,46 @@ def test_ising():
 	print("Tests passed")
 
 
-def ising_main(population, alpha=1.0, external=0.0):
-    
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.set_axis_off()
-    im = ax.imshow(population, interpolation='none', cmap='RdPu_r')
+def ising_main(population, alpha=1.0, external=0.0, is_network=False):
 
-    # Iterating an update 100 times
-    for frame in range(100):
-        for step in range(1000):
-            ising_step(population, external, alpha)
-        print('Step:', frame, end='\r')
-        plot_ising(im, population)
+	# Iterating an update 100 times
+	if is_network == False:
+		fig = plt.figure()
+		ax = fig.add_subplot(111)
+		ax.set_axis_off()
+		im = ax.imshow(population, interpolation='none', cmap='RdPu_r')
+		for frame in range(100):
+			for step in range(1000):
+					ising_step(population, external, alpha)
+			print('Step:', frame, end='\r')
+			plot_ising(im, population)
+	
+	if is_network == True:
+		add_agreement(population)
+		#adds agreement values to the network
+		fig = plt.figure()
+		ax = fig.add_subplot(111)
+		ax.set_axis_off()
+		#creates a figure to display the network on
+		mean_opinions = []
+		for frame in range(100):
+			mean_opinion = network_ising_step(population, external, alpha)
+			mean_opinions.append(mean_opinion)
+			print('Step:', frame, end='\r')
+			population.ising_plot(fig, ax)
+			plt.pause(0.1)
+			#iterates though 100 steps of the network, performs steps whcih both update the network and return the mean opinion to be graphed over time. Plots the current state of the network.
+		plt.pause(2.0)
+		plt.close()
+		fig2 = plt.figure()
+		ax2 = fig2.add_subplot(111)
+		#ends the first plot and creates a second
+		nums = np.arange(len(mean_opinions))
+		plt.plot(nums, mean_opinions)
+		plt.xlabel("Time")
+		plt.ylabel("Mean opinion")
+		plt.show()
+		#plots the change in mean opinion over time
 
 '''
 ==============================================================================================================
@@ -569,122 +627,71 @@ This section contains code for the Defuant Model - task 2 in the assignment
 ==============================================================================================================
 '''
 
-def defuant_main(pop, beta, threshold, timestep, node_amount):
-	#Task 2
-	if node_amount = 0:
+def defuant_main(pop, beta, threshold, timestep):
+	# Generate initial population with random opinions
+	population = np.random.rand(pop)
 	
-            # Generate initial population with random opinions
-		population = np.random.rand(pop)
-	    
-	    # Create subplots for visualization
-		fig, (ax1, ax2) = plt.subplots(1, 2)
-		plt.ion()  # Turn on interactive mode for dynamic plotting
-	    
-	    # Iterate over timesteps
-		for i in range(timestep):
-	        # Plot histogram of opinions
-			plot_opinions(population, i+1, ax1)
-	        
-	        # Plot individual opinions over time
-			plot_opinions1(population, i+1, ax2, beta, threshold)
+	# Create subplots for visualization
+	fig, (ax1, ax2) = plt.subplots(1, 2)
+	plt.ion()  # Turn on interactive mode for dynamic plotting
 	
-	        # Update opinions of the population
-			for j in range(timestep):
-				update_opinions(population, beta, threshold)
-	        
-	        # This section can be uncommented to see the full animation of the plot
-	        # Draw and pause to allow for interactive plotting
-			plt.draw()
-			plt.pause(0.01)
-	
-	        # Clear the histogram plot for the next timestep, except for the last timestep
-			if i != timestep-1:
-				ax1.clear()
-			
-	    # Turn off interactive mode and display plots
-			plt.ioff()
-			plt.show()
-	#Task 5
-	else :
-		population = np.random.rand(node_amount)
-		defuant_small = Network()
-		defuant_small.make_small_world_network(node_amount, 0.2)
-		defuant_list = defuant_small.get_connections_list()
-		images = []
-		mean = 0
-		mean_list = []
-		for i in range (1, timestep):
-			
-			for j in range (0, node_amount-1):
-				mean = mean + population[j] / node_amount
-				mean_list[].append(mean)
-			
-			defuant_small.plot_world(population, i)
-			
-			images.append(imageio.imread(f"frame_{i:03d}.png"))
-			
-			update_defuant_world(population, beta, threshold, defuant_list)
+	# Iterate over timesteps
+	for i in range(timestep):
+		# Plot histogram of opinions
+		plot_opinions(population, i+1, ax1)
 		
-		imageio.mimsave('small_world.gif', images, fps=10)
+		# Plot individual opinions over time
+		plot_opinions1(population, i+1, ax2, beta, threshold)
+
+		# Update opinions of the population
+		for j in range(timestep):
+			update_opinions(population, beta, threshold)
 		
-		plt.figure(figsize=(10, 5))
-		plt.plot(mean_list[], marker='o')
-		plt.title('Mean opinion over time')
-		plt.xlabel('Timestep')
-		plt.ylabel('Mean opinion')
-		plt.grid(True)
+		# This section can be uncommented to see the full animation of the plot
+		# Draw and pause to allow for interactive plotting
+		plt.draw()
+		plt.pause(0.01)
+
+		# Clear the histogram plot for the next timestep, except for the last timestep
+		if i != timestep-1:
+			ax1.clear()
+		
+	# Turn off interactive mode and display plots
+		plt.ioff()
 		plt.show()
 
 # Function to update opinions based on Deffuant model dynamics
 def update_opinions(population, beta, threshold):
-    # Select a random individual
-    initial = random.randint(0, len(population)-1)
-    
-    # Determine the index of the neighbor, handling boundary conditions
-    neighbour = (initial + random.choice([-1, 1])) % len(population)
+	# Select a random individual
+	initial = random.randint(0, len(population)-1)
+	
+	# Determine the index of the neighbor, handling boundary conditions
+	neighbour = (initial + random.choice([-1, 1])) % len(population)
 
-    # Calculate the difference in opinions
-    difference = abs(population[initial] - population[neighbour])
-    
-    # Update opinions if the difference is below the threshold
-    if difference < threshold:
-        # Update opinions based on the difference and beta parameter
-        update_value = beta * (population[neighbour] - population[initial])
-        update_value1 = beta * (population[initial] - population[neighbour])
-        population[initial] += update_value
-        population[neighbour] += update_value1 
-    return population
-
-# Function by using small world network
-def update_defuant_world(population, beta, threshold, connections_list):
-
-	initial = random.randint(0, len(population) - 1)
-
-	neighbour = connections_list[random_index]
-
+	# Calculate the difference in opinions
 	difference = abs(population[initial] - population[neighbour])
-
+	
 	# Update opinions if the difference is below the threshold
 	if difference < threshold:
 		# Update opinions based on the difference and beta parameter
 		update_value = beta * (population[neighbour] - population[initial])
 		update_value1 = beta * (population[initial] - population[neighbour])
 		population[initial] += update_value
-		population[neighbour] += update_value1
+		population[neighbour] += update_value1 
 	return population
 
 # Function to plot histogram of opinions at each timestep
 def plot_opinions(population, timestep, ax):
-    bins = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
-    ax.hist(population, bins=bins)
-    ax.set_title(f"Timestep = {timestep}")
-    ax.set_xlabel('Opinion')
+	bins = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+	ax.hist(population, bins=bins)
+	ax.set_title(f"Timestep = {timestep}")
+	ax.set_xlabel('Opinion')
 
 # Function to plot individual opinions over time
 def plot_opinions1(population, timestep, ax, beta, threshold):
-    x = [timestep] * len(population)
-    ax.scatter(x, population, color="red")
-    ax.set_title(f"Coupling: {beta}, Threshold: {threshold}")
+	x = [timestep] * len(population)
+	ax.scatter(x, population, color="red")
+	ax.set_title(f"Coupling: {beta}, Threshold: {threshold}")
 
 # Function to test the Deffuant model
 def test_defuant():
@@ -705,7 +712,7 @@ This section contains code for the main function- you should write some code for
 
 def main():
 	# Handles flags using the module "Argparse".
-    ## Optional arguments - Used for a random network and tests correspondingly.
+	## Optional arguments - Used for a random network and tests correspondingly.
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-network")
 	parser.add_argument("-test_network",action="store_true")
@@ -715,28 +722,36 @@ def main():
 	parser.add_argument("-alpha", default=1.0, type=float)
 	parser.add_argument("-test_ising", action="store_true")
 
+	parser.add_argument("-use_network", default=0, type=int)
+
 	parser.add_argument("-defuant", action="store_true")
 	parser.add_argument("-beta", default=0.2, type=float)
 	parser.add_argument("-threshold", default=0.2, type=float)
 	parser.add_argument("-test_defuant", action="store_true")
 
-    ## Optional argument - Used to help the user with understanding the structure of the network
+	## Optional argument - Used to help the user with understanding the structure of the network
 	parser.add_argument("-analysis",action="store_true")
 
 	parser.add_argument("-ring_network", default=0, type=int)
 	parser.add_argument("-small_world", default=0, type=int)
 	parser.add_argument("-re_wire", default=0.2, type=float)
 
-	 parser.add_argument('-use_network', type=int)
-
 	args = parser.parse_args()
+	
+	if args.use_network == 0:
+		ising_pop = random_pop(100, 100, 0.5)
+		is_network = False
+	else:
+		network = Network()
+		network.make_small_world_network(args.use_network)
+		ising_pop = network
+		is_network = True
 
-	ising_pop = random_pop(100, 100, 0.5)
 	alpha = args.alpha
 	external = args.external
 
 	if args.ising_model:
-		ising_main(ising_pop, alpha, external)
+		ising_main(ising_pop, alpha, external, is_network)
 	
 	if args.test_ising:
 		test_ising()
@@ -744,24 +759,18 @@ def main():
 	# Set default values for population size and timestep
 	pop = 100
 	timestep = 100
-	#Task 5 default assumption
-	node_amount = 0
-	
 
 	# Assign values of beta and threshold from command-line arguments
 	beta = args.beta
 	threshold = args.threshold
-    	
-	if args.use_network:
-        	node_amount = args.use_network
-		
+	
 	# Check if the '-defuant' flag is provided
 	if args.defuant:
-       		defuant_main(pop, beta, threshold, timestep, node_amount) # Call the 'defuant_main' function with specified parameters
-	
+		# Call the 'defuant_main' function with specified parameters
+		defuant_main(pop, beta, threshold, timestep)
 	if args.test_defuant:
 		test_defuant()
-	
+
 	if args.network:
 		testing_network = Network()
 		testing_network.make_random_network(int(args.network),0.50)
@@ -772,14 +781,12 @@ def main():
 
 	if args.test_network:
 		test_networks()
-    
+	
 	if args.analysis:
 		testing_network = Network()
 		testing_network.make_random_network(10,0.50)
 
 		testing_network.analysis()
-
-	
 
 
 	ring_N = args.ring_network
