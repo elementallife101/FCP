@@ -74,22 +74,18 @@ Task 4 (Small World Networks):
 Task 5 (Combining Models):
 - Required Dependencies
 	- Argparse
-	- imageio
  	- numpy
         - matplotlib
         - random
  	  	 
 - Flags
-	- -defuant <>
-   		If we use the flag "- use_network<size(Type:int)>" at the same thime, his argument plots the animation of the network with specified size over timesteps and the mean opinion over timesteps.
-  		Else, we default to use random network
  	- -use_network<size(Type:int)>
-		This argument creates a small world network of the specified size and will use in defuand model
+		This argument creates a small world network of the specified size and will use the ising model to track changes in opinion on it. It will display a network of nodes with a blue node representing positive agreement and red node representing negative agreement. It will then plot a graph of the change in mean opinion over time. This must be passed with the -ising_model flag.
 Output Examples:
 
 
 Credits:
 Chenghe Tang - 
 Flavio Vela - 
-Rory Sutherland - 
+Rory Sutherden - 
 Tycho Twohig - https://github.com/elementallife101/FCP
