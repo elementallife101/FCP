@@ -37,7 +37,14 @@ Task 1 (Ising Model):
 
 Task 2 (Defuant Model):
 - Required Dependencies
+	-Argparse
+	-Numpy
+	-Matplotlib
+  	-random
 - Flags
+        -defuant <>
+   		If we use the flag "- use_network<size(Type:int)>" at the same thime, his argument plots the animation of the network with specified size over timesteps and the mean opinion over timesteps.
+  		Else, we default to use random network
 
 Task 3 (Networks):
 - Required Dependencies
@@ -66,8 +73,18 @@ Task 4 (Small World Networks):
 
 Task 5 (Combining Models):
 - Required Dependencies
+	- Argparse
+	- imageio
+ 	- numpy
+        - matplotlib
+        - random
+ 	  	 
 - Flags
-
+	- defuant <>
+   		If we use the flag "- use_network<size(Type:int)>" at the same thime, his argument plots the animation of the network with specified size over timesteps and the mean opinion over timesteps.
+  		Else, we default to use random network
+ 	- use_network<size(Type:int)>
+		This argument creates a small world network of the specified size and will use in defuand model
 Output Examples:
 
 
