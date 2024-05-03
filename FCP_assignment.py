@@ -335,11 +335,15 @@ class Network:
 					neighbour_x = network_radius * np.cos(neighbour_angle)
 					neighbour_y = network_radius * np.sin(neighbour_angle)
 					ax.plot((node_x, neighbour_x), (node_y, neighbour_y), color='black')
-
-	 def print_connections(self):
+	
+	#Chenghe's part for Task 5
+	def get_connections_list(self):
+        	connections_list = []
         	for node in self.nodes:
             		connected_nodes = [i for i, connected in enumerate(node.connections) if connected == 1]
-            	
+            		connections_list.append(connected_nodes)
+        return connections_list
+
 
 
 def test_networks():
