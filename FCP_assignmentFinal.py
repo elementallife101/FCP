@@ -359,19 +359,7 @@ class Network:
 					neighbour_angle = neighbour_index * 2 * np.pi / num_nodes
 					neighbour_x = network_radius * np.cos(neighbour_angle)
 					neighbour_y = network_radius * np.sin(neighbour_angle)
-					ax.plot((node_x, neighbour_x), (node_y, neighbour_y), color='black')		
-		plt.savefig(f"frame_{i:03d}.png")
-    		plt.close()
-
-	#Task5
-	def get_connections_list(self):
-        	connections_list = []
-        	for node in self.nodes:
-            		connected_nodes = [i for i, connected in enumerate(node.connections) if connected == 1]
-            		connections_list.append(connected_nodes)
-        return connections_list
-
-
+					ax.plot((node_x, neighbour_x), (node_y, neighbour_y), color='black')
 
 def test_networks():
 
@@ -639,70 +627,37 @@ This section contains code for the Defuant Model - task 2 in the assignment
 ==============================================================================================================
 '''
 
-def defuant_main(pop, beta, threshold, timestep, node_amount):
-	#Task 2
-	if node_amount = 0:
+def defuant_main(pop, beta, threshold, timestep):
+	# Generate initial population with random opinions
+	population = np.random.rand(pop)
 	
-            # Generate initial population with random opinions
-		population = np.random.rand(pop)
-	    
-	    # Create subplots for visualization
-		fig, (ax1, ax2) = plt.subplots(1, 2)
-		plt.ion()  # Turn on interactive mode for dynamic plotting
-	    
-	    # Iterate over timesteps
-		for i in range(timestep):
-	        # Plot histogram of opinions
-			plot_opinions(population, i+1, ax1)
-	        
-	        # Plot individual opinions over time
-			plot_opinions1(population, i+1, ax2, beta, threshold)
+	# Create subplots for visualization
+	fig, (ax1, ax2) = plt.subplots(1, 2)
+	plt.ion()  # Turn on interactive mode for dynamic plotting
 	
-	        # Update opinions of the population
-			for j in range(timestep):
-				update_opinions(population, beta, threshold)
-	        
-	        # This section can be uncommented to see the full animation of the plot
-	        # Draw and pause to allow for interactive plotting
-			plt.draw()
-			plt.pause(0.01)
-	
-	        # Clear the histogram plot for the next timestep, except for the last timestep
-			if i != timestep-1:
-				ax1.clear()
-			
-	    # Turn off interactive mode and display plots
-			plt.ioff()
-			plt.show()
-	#Task 5
-	else :
-		population = np.random.rand(node_amount)
-		defuant_small = Network()
-		defuant_small.make_small_world_network(node_amount, 0.2)
-		defuant_list = defuant_small.get_connections_list()
-		images = []
-		mean = 0
-		mean_list = []
-		for i in range (1, timestep):
-			
-			for j in range (0, node_amount-1):
-				mean = mean + population[j] / node_amount
-				mean_list[].append(mean)
-			
-			defuant_small.plot_world(population, i)
-			
-			images.append(imageio.imread(f"frame_{i:03d}.png"))
-			
-			update_defuant_world(population, beta, threshold, defuant_list)
+	# Iterate over timesteps
+	for i in range(timestep):
+		# Plot histogram of opinions
+		plot_opinions(population, i+1, ax1)
 		
-		imageio.mimsave('small_world.gif', images, fps=10)
+		# Plot individual opinions over time
+		plot_opinions1(population, i+1, ax2, beta, threshold)
+
+		# Update opinions of the population
+		for j in range(timestep):
+			update_opinions(population, beta, threshold)
 		
-		plt.figure(figsize=(10, 5))
-		plt.plot(mean_list[], marker='o')
-		plt.title('Mean opinion over time')
-		plt.xlabel('Timestep')
-		plt.ylabel('Mean opinion')
-		plt.grid(True)
+		# This section can be uncommented to see the full animation of the plot
+		# Draw and pause to allow for interactive plotting
+		plt.draw()
+		plt.pause(0.01)
+
+		# Clear the histogram plot for the next timestep, except for the last timestep
+		if i != timestep-1:
+			ax1.clear()
+		
+	# Turn off interactive mode and display plots
+		plt.ioff()
 		plt.show()
 
 # Function to update opinions based on Deffuant model dynamics
@@ -781,8 +736,6 @@ def main():
 	parser.add_argument("-small_world", default=0, type=int)
 	parser.add_argument("-re_wire", default=0.2, type=float)
 
-	 parser.add_argument('-use_network', type=int)
-
 	args = parser.parse_args()
 	
 	if args.use_network == 0:
@@ -810,14 +763,11 @@ def main():
 	# Assign values of beta and threshold from command-line arguments
 	beta = args.beta
 	threshold = args.threshold
-    	
-	if args.use_network:
-        	node_amount = args.use_network
-		
+	
 	# Check if the '-defuant' flag is provided
 	if args.defuant:
-       		defuant_main(pop, beta, threshold, timestep, node_amount) # Call the 'defuant_main' function with specified parameters
-	
+		# Call the 'defuant_main' function with specified parameters
+		defuant_main(pop, beta, threshold, timestep)
 	if args.test_defuant:
 		test_defuant()
 
