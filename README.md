@@ -80,10 +80,10 @@ Task 5 (Combining Models):
         - random
  	  	 
 - Flags
-	- defuant <>
+	- -defuant <>
    		If we use the flag "- use_network<size(Type:int)>" at the same thime, his argument plots the animation of the network with specified size over timesteps and the mean opinion over timesteps.
   		Else, we default to use random network
- 	- use_network<size(Type:int)>
+ 	- -use_network<size(Type:int)>
 		This argument creates a small world network of the specified size and will use in defuand model
 Output Examples:
 
